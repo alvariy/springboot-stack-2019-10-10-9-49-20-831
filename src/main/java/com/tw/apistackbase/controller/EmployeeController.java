@@ -15,9 +15,10 @@ public class EmployeeController {
     private List<Employee> employeeList = new ArrayList();
 
     @GetMapping(value = "/{id}", produces = "application/json")
-    public @ResponseBody Employee getEmployee(@PathVariable int id)
+    public @ResponseBody List<Employee> getEmployee(@PathVariable int id)
     {
-        return new Employee(id,"Iyan",3,"Male");
+        List<Employee> searchedEmployeeList = employeeList.stream().filter(o -> o.getId() == id).collect(Collectors.toList());
+        return searchedEmployeeList;
     }
 
     @GetMapping(produces = "application/json")
@@ -43,12 +44,18 @@ public class EmployeeController {
         return employeeList;
     }
 
-    @PutMapping(path = "/deleteEmployee/{id}", consumes = "application/json", produces = "application/json")
-    public List<Employee> updateRecord(@PathVariable int id)
+    @PutMapping(path = "/updateEmployee/{id}", consumes = "application/json", produces = "application/json")
+    public List<Employee> updateRecord(@PathVariable int id, @RequestBody Employee employee)
     {
 
-        employeeList.removeIf(o -> o.getId() == id);
-        employeeList = employeeList.stream().filter(o -> o.getId() != id).collect(Collectors.toList());
+        employeeList = employeeList.stream().map(o ->
+        {
+         if(o.getId() == id)
+         {
+             return employee;
+         }
+         return o;
+        }).collect(Collectors.toList());
 
         return employeeList;
     }
